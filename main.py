@@ -29,7 +29,7 @@ from scanner.utils import (
 
 
 WARNING_TEXT = "This tool is intended only for authorized security testing."
-NVD_NOTICE = "This product uses data from the NVD API but is not endorsed or certified by the NVD."
+NVD_NOTICE = "This product uses data from the NVD API."
 
 
 def build_parser() -> argparse.ArgumentParser:
