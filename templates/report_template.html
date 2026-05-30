@@ -7,201 +7,48 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-2: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --border: #334155;
-      --accent: #38bdf8;
-      --critical: #ef4444;
-      --high: #f97316;
-      --medium: #facc15;
-      --low: #22c55e;
-      --unknown: #94a3b8;
+      --bg: #0b0f14;
+      --surface: #111820;
+      --surface-2: #151e28;
+      --surface-3: #1b2531;
+      --line: #2a3644;
+      --line-soft: #202b37;
+      --text: #e6edf3;
+      --text-strong: #ffffff;
+      --muted: #9aa8b6;
+      --muted-2: #748392;
+      --accent: #5fb3d9;
+      --critical: #d84f4f;
+      --high: #e07b39;
+      --medium: #d4aa32;
+      --low: #4ca86a;
+      --unknown: #7d8996;
+      --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      background: var(--bg);
+    }
+
     body {
       margin: 0;
-      background: var(--bg);
+      background:
+        linear-gradient(180deg, rgba(95, 179, 217, 0.04), transparent 280px),
+        var(--bg);
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.5;
-    }
-
-    .page {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 32px 0 48px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 20px;
-      align-items: stretch;
-      margin-bottom: 24px;
-    }
-
-    .hero-main,
-    .stat,
-    .section {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-
-    .hero-main {
-      padding: 28px;
-    }
-
-    .eyebrow {
-      color: var(--accent);
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.45;
       letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
-    }
-
-    h1 {
-      margin-bottom: 12px;
-      font-size: clamp(2rem, 4vw, 3.6rem);
-      line-height: 1.05;
-      letter-spacing: 0;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .warning {
-      display: inline-flex;
-      margin-top: 16px;
-      padding: 10px 12px;
-      border: 1px solid rgba(250, 204, 21, 0.35);
-      border-radius: 8px;
-      color: #fde68a;
-      background: rgba(250, 204, 21, 0.08);
-      font-weight: 600;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .stat {
-      padding: 18px;
-    }
-
-    .stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-
-    .stat strong {
-      display: block;
-      margin-top: 8px;
-      font-size: 1.7rem;
-      overflow-wrap: anywhere;
-    }
-
-    .section {
-      margin-top: 20px;
-      overflow: hidden;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: center;
-      padding: 20px 22px;
-      border-bottom: 1px solid var(--border);
-      background: var(--panel-2);
-    }
-
-    .section-header h2 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 760px;
-    }
-
-    th,
-    td {
-      padding: 14px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--muted);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0;
-      background: rgba(15, 23, 42, 0.55);
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    code {
-      color: #bae6fd;
-      background: rgba(56, 189, 248, 0.12);
-      padding: 2px 6px;
-      border-radius: 6px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-width: 84px;
-      justify-content: center;
-      padding: 4px 8px;
-      border-radius: 999px;
-      color: #020617;
-      font-size: 0.75rem;
-      font-weight: 800;
-    }
-
-    .severity-critical { background: var(--critical); color: white; }
-    .severity-high { background: var(--high); }
-    .severity-medium { background: var(--medium); }
-    .severity-low { background: var(--low); }
-    .severity-unknown { background: var(--unknown); }
-
-    .empty {
-      padding: 22px;
-      color: var(--muted);
     }
 
     a {
-      color: #7dd3fc;
+      color: #8bd1f1;
       text-decoration: none;
     }
 
@@ -209,81 +56,856 @@
       text-decoration: underline;
     }
 
-    @media (max-width: 860px) {
-      .hero {
+    .report-shell {
+      width: min(1320px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-title {
+      color: var(--text-strong);
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      margin-top: 3px;
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .classification {
+      border: 1px solid rgba(212, 170, 50, 0.45);
+      color: #f0d27a;
+      background: rgba(212, 170, 50, 0.08);
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .print-button {
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 7px 10px;
+      font: 700 12px var(--sans);
+      cursor: pointer;
+    }
+
+    .print-button:hover {
+      border-color: var(--accent);
+      color: var(--text-strong);
+    }
+
+    .header-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.85fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .report-header,
+    .summary-panel,
+    .panel,
+    .metric,
+    .evidence-strip {
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .report-header {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 30px;
+      line-height: 1.1;
+      font-weight: 760;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .target-line {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      background: #0e141b;
+      color: var(--text);
+      min-height: 28px;
+      padding: 5px 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .pill-label {
+      color: var(--muted-2);
+      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .warning {
+      margin-top: 18px;
+      border-left: 3px solid var(--medium);
+      background: rgba(212, 170, 50, 0.07);
+      color: #ebdca2;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .summary-panel {
+      padding: 0;
+    }
+
+    .summary-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+
+    .summary-title h2,
+    .panel-title h2 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 13px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .summary-body {
+      padding: 16px;
+    }
+
+    .risk-score {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .risk-dial {
+      width: 92px;
+      height: 92px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+        var(--surface-3);
+      position: relative;
+    }
+
+    .risk-dial::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 2px solid var(--line);
+    }
+
+    .risk-dial strong {
+      position: relative;
+      color: var(--text-strong);
+      font-size: 28px;
+      line-height: 1;
+      font-family: var(--mono);
+    }
+
+    .risk-copy strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .risk-copy span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .severity-stack {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .severity-box {
+      border: 1px solid var(--line);
+      background: #0e141b;
+      min-height: 58px;
+      padding: 8px;
+    }
+
+    .severity-box span {
+      display: block;
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .severity-box strong {
+      display: block;
+      margin-top: 6px;
+      color: var(--text-strong);
+      font-family: var(--mono);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .severity-box.critical { border-top: 3px solid var(--critical); }
+    .severity-box.high { border-top: 3px solid var(--high); }
+    .severity-box.medium { border-top: 3px solid var(--medium); }
+    .severity-box.low { border-top: 3px solid var(--low); }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      padding: 13px 14px;
+      min-height: 82px;
+    }
+
+    .metric-label {
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 10px;
+      color: var(--text-strong);
+      font-family: var(--mono);
+      font-size: 25px;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .metric-note {
+      margin-top: 7px;
+      color: var(--muted-2);
+      font-size: 11px;
+    }
+
+    .evidence-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 16px;
+    }
+
+    .evidence-item {
+      padding: 11px 12px;
+      border-right: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .evidence-item:last-child {
+      border-right: 0;
+    }
+
+    .evidence-item span {
+      display: block;
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .evidence-item strong {
+      display: block;
+      margin-top: 5px;
+      color: var(--text);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .panel {
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+
+    .panel-meta {
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+      background: var(--surface);
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #101720;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+      text-align: left;
+      text-transform: uppercase;
+      padding: 9px 12px;
+      white-space: nowrap;
+    }
+
+    td {
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--text);
+      padding: 11px 12px;
+      vertical-align: top;
+    }
+
+    tbody tr:hover td {
+      background: rgba(95, 179, 217, 0.035);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .port-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--text-strong);
+    }
+
+    .port-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--low);
+      display: inline-block;
+    }
+
+    .service-name {
+      color: var(--text-strong);
+      font-weight: 700;
+    }
+
+    .subtle {
+      color: var(--muted-2);
+    }
+
+    .banner-text {
+      color: #cbd6e1;
+      font-family: var(--mono);
+      font-size: 11px;
+      max-width: 520px;
+      overflow-wrap: anywhere;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 78px;
+      min-height: 22px;
+      border: 1px solid transparent;
+      padding: 3px 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #101419;
+    }
+
+    .severity-critical {
+      background: rgba(216, 79, 79, 0.2);
+      border-color: rgba(216, 79, 79, 0.55);
+      color: #ffb4b4;
+    }
+
+    .severity-high {
+      background: rgba(224, 123, 57, 0.18);
+      border-color: rgba(224, 123, 57, 0.52);
+      color: #ffc19a;
+    }
+
+    .severity-medium {
+      background: rgba(212, 170, 50, 0.17);
+      border-color: rgba(212, 170, 50, 0.5);
+      color: #ecd27a;
+    }
+
+    .severity-low {
+      background: rgba(76, 168, 106, 0.17);
+      border-color: rgba(76, 168, 106, 0.52);
+      color: #a4e0b5;
+    }
+
+    .severity-unknown {
+      background: rgba(125, 137, 150, 0.16);
+      border-color: rgba(125, 137, 150, 0.45);
+      color: #c8d0d8;
+    }
+
+    .cve-id {
+      font-family: var(--mono);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .description {
+      color: #d3dde7;
+      max-width: 700px;
+    }
+
+    .empty-state {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 22px;
+      color: var(--muted);
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          rgba(255, 255, 255, 0.015),
+          rgba(255, 255, 255, 0.015) 8px,
+          transparent 8px,
+          transparent 16px
+        );
+    }
+
+    .empty-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-weight: 800;
+      background: #0e141b;
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text-strong);
+      margin-bottom: 3px;
+    }
+
+    .os-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      color: var(--text);
+    }
+
+    .os-confidence {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .footnote {
+      margin: 14px 2px 0;
+      color: var(--muted-2);
+      font-size: 11px;
+    }
+
+    @media (max-width: 1040px) {
+      .header-grid {
         grid-template-columns: 1fr;
       }
 
-      .stats {
-        grid-template-columns: 1fr 1fr;
+      .metrics-grid,
+      .evidence-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .evidence-item:nth-child(2) {
+        border-right: 0;
+      }
+
+      .evidence-item:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--line);
       }
     }
 
-    @media (max-width: 560px) {
-      .page {
-        width: min(100% - 20px, 1180px);
+    @media (max-width: 680px) {
+      .report-shell {
+        width: min(100% - 22px, 1320px);
         padding-top: 18px;
       }
 
-      .hero-main,
-      .stat {
-        padding: 16px;
+      .top-bar {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
-      .stats {
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .report-header {
+        padding: 17px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .metrics-grid,
+      .evidence-strip,
+      .severity-stack {
         grid-template-columns: 1fr;
+      }
+
+      .evidence-item {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .evidence-item:last-child {
+        border-bottom: 0;
+      }
+
+      .risk-score {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-title {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media print {
+      :root {
+        color-scheme: light;
+        --bg: #ffffff;
+        --surface: #ffffff;
+        --surface-2: #f2f5f8;
+        --surface-3: #ffffff;
+        --line: #b7c0ca;
+        --line-soft: #d8dee5;
+        --text: #17202a;
+        --text-strong: #000000;
+        --muted: #4b5563;
+        --muted-2: #687381;
+      }
+
+      body {
+        background: #ffffff;
+        color: #17202a;
+        font-size: 11px;
+      }
+
+      .report-shell {
+        width: 100%;
+        padding: 0;
+      }
+
+      .print-button {
+        display: none;
+      }
+
+      .panel,
+      .report-header,
+      .summary-panel,
+      .metric,
+      .evidence-strip {
+        break-inside: avoid;
+      }
+
+      th {
+        position: static;
+      }
+
+      table {
+        min-width: 0;
+      }
+
+      a {
+        color: #000000;
+        text-decoration: none;
       }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <div class="hero-main">
-        <div class="eyebrow">Network Vulnerability Report</div>
+  {% set ns = namespace(critical=0, high=0, medium=0, low=0, unknown=0) %}
+  {% for vuln in vulnerabilities %}
+    {% if vuln.severity == "CRITICAL" %}
+      {% set ns.critical = ns.critical + 1 %}
+    {% elif vuln.severity == "HIGH" %}
+      {% set ns.high = ns.high + 1 %}
+    {% elif vuln.severity == "MEDIUM" %}
+      {% set ns.medium = ns.medium + 1 %}
+    {% elif vuln.severity == "LOW" %}
+      {% set ns.low = ns.low + 1 %}
+    {% else %}
+      {% set ns.unknown = ns.unknown + 1 %}
+    {% endif %}
+  {% endfor %}
+  {% set risk_score = (ns.critical * 10) + (ns.high * 7) + (ns.medium * 4) + ns.low %}
+
+  <main class="report-shell">
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-mark">NS</div>
+        <div class="brand-text">
+          <div class="brand-title">Network Vulnerability Scanner</div>
+          <div class="brand-subtitle">Assessment Report</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="classification">Authorized Security Testing</div>
+        <button class="print-button" type="button" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </header>
+
+    <section class="header-grid">
+      <div class="report-header">
+        <div class="kicker">Target Assessment</div>
         <h1>{{ target }}</h1>
-        <p class="muted">
-          Scan completed at <strong>{{ metadata.scan_timestamp }}</strong> against
-          <code>{{ target_ip }}</code>.
-        </p>
+        <div class="target-line">
+          <span class="pill"><span class="pill-label">IP</span>{{ target_ip }}</span>
+          <span class="pill"><span class="pill-label">Ports</span>{{ metadata.port_expression }}</span>
+          <span class="pill"><span class="pill-label">Generated</span>{{ metadata.scan_timestamp }}</span>
+        </div>
         <div class="warning">{{ authorized_warning }}</div>
       </div>
-      <div class="stats">
-        <div class="stat">
-          <span>Ports Scanned</span>
-          <strong>{{ ports_scanned }}</strong>
+
+      <aside class="summary-panel">
+        <div class="summary-title">
+          <h2>Executive Risk Summary</h2>
+          <span class="panel-meta">NVD correlation</span>
         </div>
-        <div class="stat">
-          <span>Open Ports</span>
-          <strong>{{ open_ports | length }}</strong>
+        <div class="summary-body">
+          <div class="risk-score">
+            <div class="risk-dial"><strong>{{ risk_score }}</strong></div>
+            <div class="risk-copy">
+              <strong>
+                {% if ns.critical > 0 %}
+                  Critical exposure requires immediate review
+                {% elif ns.high > 0 %}
+                  High-priority findings detected
+                {% elif ns.medium > 0 %}
+                  Moderate risk profile detected
+                {% elif vulnerabilities %}
+                  Low-risk findings detected
+                {% else %}
+                  No matched CVEs in this scan
+                {% endif %}
+              </strong>
+              <span>Risk score is a simple weighted indicator based on matched CVE severities and should be validated by an analyst.</span>
+            </div>
+          </div>
+
+          <div class="severity-stack">
+            <div class="severity-box critical">
+              <span>Critical</span>
+              <strong>{{ ns.critical }}</strong>
+            </div>
+            <div class="severity-box high">
+              <span>High</span>
+              <strong>{{ ns.high }}</strong>
+            </div>
+            <div class="severity-box medium">
+              <span>Medium</span>
+              <strong>{{ ns.medium }}</strong>
+            </div>
+            <div class="severity-box low">
+              <span>Low</span>
+              <strong>{{ ns.low }}</strong>
+            </div>
+          </div>
         </div>
-        <div class="stat">
-          <span>Potential CVEs</span>
-          <strong>{{ vulnerabilities | length }}</strong>
-        </div>
-        <div class="stat">
-          <span>Severity Filter</span>
-          <strong>{{ severity_filter }}</strong>
-        </div>
+      </aside>
+    </section>
+
+    <section class="metrics-grid" aria-label="Scan metrics">
+      <div class="metric">
+        <div class="metric-label">Ports Scanned</div>
+        <strong class="metric-value">{{ ports_scanned }}</strong>
+        <div class="metric-note">TCP connect checks</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Open Ports</div>
+        <strong class="metric-value">{{ open_ports | length }}</strong>
+        <div class="metric-note">Reachable services</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Detected Services</div>
+        <strong class="metric-value">{{ services | length }}</strong>
+        <div class="metric-note">Nmap and banner data</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Potential CVEs</div>
+        <strong class="metric-value">{{ vulnerabilities | length }}</strong>
+        <div class="metric-note">Minimum severity: {{ severity_filter }}</div>
+      </div>
+    </section>
+
+    <section class="evidence-strip" aria-label="Report metadata">
+      <div class="evidence-item">
+        <span>Target Host</span>
+        <strong>{{ target }}</strong>
+      </div>
+      <div class="evidence-item">
+        <span>Resolved Address</span>
+        <strong>{{ target_ip }}</strong>
+      </div>
+      <div class="evidence-item">
+        <span>Scan Window</span>
+        <strong>{{ metadata.scan_timestamp }}</strong>
+      </div>
+      <div class="evidence-item">
+        <span>Scanner</span>
+        <strong>{{ metadata.scanner }}</strong>
       </div>
     </section>
 
     {% if os_info %}
-    <section class="section">
-      <div class="section-header">
-        <h2>OS Detection</h2>
+    <section class="panel">
+      <div class="panel-title">
+        <h2>Operating System Fingerprint</h2>
+        <span class="panel-meta">Nmap OS detection</span>
       </div>
-      <div class="empty">
-        Best match: <strong>{{ os_info.name }}</strong>
-        {% if os_info.accuracy %}with {{ os_info.accuracy }}% accuracy{% endif %}
+      <div class="os-row">
+        <span class="badge severity-unknown">OS Match</span>
+        <strong>{{ os_info.name }}</strong>
+        {% if os_info.accuracy %}
+          <span class="os-confidence">{{ os_info.accuracy }}% confidence</span>
+        {% endif %}
       </div>
     </section>
     {% endif %}
 
-    <section class="section">
-      <div class="section-header">
-        <h2>Open Ports and Services</h2>
-        <span class="muted">{{ metadata.port_expression }}</span>
+    <section class="panel">
+      <div class="panel-title">
+        <h2>Service Enumeration</h2>
+        <span class="panel-meta">{{ open_ports | length }} open / {{ ports_scanned }} scanned</span>
       </div>
       {% if services %}
       <div class="table-wrap">
@@ -291,71 +913,91 @@
           <thead>
             <tr>
               <th>Port</th>
+              <th>State</th>
               <th>Service</th>
               <th>Product</th>
               <th>Version</th>
-              <th>Banner</th>
+              <th>Evidence / Banner</th>
             </tr>
           </thead>
           <tbody>
             {% for service in services %}
             <tr>
-              <td><code>{{ service.port }}/{{ service.protocol }}</code></td>
-              <td>{{ service.service or "unknown" }}</td>
+              <td>
+                <span class="port-cell"><span class="port-dot"></span>{{ service.port }}/{{ service.protocol }}</span>
+              </td>
+              <td><span class="badge severity-low">{{ service.state }}</span></td>
+              <td>
+                <div class="service-name">{{ service.service or "unknown" }}</div>
+                <div class="subtle mono">source: {{ service.source or "socket" }}</div>
+              </td>
               <td>{{ service.product or "-" }}</td>
-              <td>{{ service.version or "-" }}</td>
-              <td>{{ service.banner or service.extrainfo or "-" }}</td>
+              <td class="mono">{{ service.version or "-" }}</td>
+              <td class="banner-text">{{ service.banner or service.extrainfo or "-" }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="empty">No open TCP ports were found in the configured range.</div>
+      <div class="empty-state">
+        <div class="empty-icon">OK</div>
+        <div>
+          <strong>No open TCP ports found</strong>
+          <span>The configured port range did not return any reachable TCP services.</span>
+        </div>
+      </div>
       {% endif %}
     </section>
 
-    <section class="section">
-      <div class="section-header">
-        <h2>Potential Vulnerabilities</h2>
-        <span class="muted">NVD keyword matching</span>
+    <section class="panel">
+      <div class="panel-title">
+        <h2>Vulnerability Correlation</h2>
+        <span class="panel-meta">{{ vulnerabilities | length }} matched records / threshold {{ severity_filter }}</span>
       </div>
       {% if vulnerabilities %}
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Port</th>
-              <th>CVE</th>
               <th>Severity</th>
               <th>CVSS</th>
+              <th>CVE</th>
+              <th>Port</th>
+              <th>Service</th>
               <th>Description</th>
             </tr>
           </thead>
           <tbody>
             {% for vuln in vulnerabilities %}
             <tr>
-              <td><code>{{ vuln.port }}/tcp</code></td>
-              <td><a href="{{ vuln.url }}" target="_blank" rel="noreferrer">{{ vuln.id }}</a></td>
               <td>
                 <span class="badge severity-{{ vuln.severity | lower }}">
                   {{ vuln.severity }}
                 </span>
               </td>
-              <td>{{ vuln.cvss_score }}</td>
-              <td>{{ vuln.description }}</td>
+              <td class="mono">{{ vuln.cvss_score }}</td>
+              <td><a class="cve-id" href="{{ vuln.url }}" target="_blank" rel="noreferrer">{{ vuln.id }}</a></td>
+              <td class="mono">{{ vuln.port }}/tcp</td>
+              <td>{{ vuln.service or "-" }}</td>
+              <td class="description">{{ vuln.description }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="empty">
-        No vulnerabilities matched the detected services and configured severity filter.
+      <div class="empty-state">
+        <div class="empty-icon">0</div>
+        <div>
+          <strong>No CVEs matched the configured criteria</strong>
+          <span>No NVD records met the detected service fingerprints and minimum severity filter.</span>
+        </div>
       </div>
       {% endif %}
     </section>
-    <p class="muted" style="margin: 18px 2px 0;">{{ nvd_notice }}</p>
+
+    <p class="footnote">{{ nvd_notice }}</p>
   </main>
 </body>
 </html>
