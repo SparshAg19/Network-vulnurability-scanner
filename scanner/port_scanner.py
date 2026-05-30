@@ -1,4 +1,3 @@
-"""TCP port scanning engines."""
 
 from __future__ import annotations
 
@@ -24,9 +23,9 @@ class PortScanner:
         logger: logging.Logger | None = None,
     ) -> None:
         self.target = target
-        self.ports = sorted(set(ports))
-        self.timeout = max(0.1, timeout)
-        self.max_threads = max(1, max_threads)
+        self.ports = self._valid_ports(ports)
+        self.timeout = min(max(0.1, timeout), 30.0)
+        self.max_threads = min(max(1, max_threads), 512)
         self.logger = logger or logging.getLogger(__name__)
 
     def scan(
@@ -89,6 +88,19 @@ class PortScanner:
             thread.join()
 
         return sorted(open_ports)
+
+    @staticmethod
+    def _valid_ports(ports: Iterable[int]) -> list[int]:
+        """Return sorted unique TCP ports, ignoring malformed values defensively."""
+        valid: set[int] = set()
+        for port in ports:
+            try:
+                candidate = int(port)
+            except (TypeError, ValueError):
+                continue
+            if 1 <= candidate <= 65535:
+                valid.add(candidate)
+        return sorted(valid)
 
     async def _scan_async(self, progress_callback: ProgressCallback | None) -> list[int]:
         """Scan ports using asyncio connections and a bounded semaphore."""

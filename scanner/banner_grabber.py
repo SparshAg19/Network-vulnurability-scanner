@@ -6,6 +6,8 @@ import logging
 import socket
 from typing import Iterable
 
+from scanner.utils import sanitize_text
+
 try:
     import nmap
 except ImportError:  # pragma: no cover - depends on optional runtime install
@@ -23,8 +25,8 @@ class ServiceDetector:
         logger: logging.Logger | None = None,
     ) -> None:
         self.target = target
-        self.open_ports = sorted(set(open_ports))
-        self.timeout = max(0.5, timeout)
+        self.open_ports = self._valid_ports(open_ports)
+        self.timeout = min(max(0.5, timeout), 30.0)
         self.logger = logger or logging.getLogger(__name__)
 
     def detect(self, os_detect: bool = False) -> tuple[list[dict], dict]:
@@ -41,13 +43,13 @@ class ServiceDetector:
                 "port": port,
                 "protocol": "tcp",
                 "state": "open",
-                "service": detected.get("service") or fallback_name or "unknown",
-                "product": detected.get("product", ""),
-                "version": detected.get("version", ""),
-                "extrainfo": detected.get("extrainfo", ""),
+                "service": sanitize_text(detected.get("service") or fallback_name or "unknown", 80),
+                "product": sanitize_text(detected.get("product", ""), 120),
+                "version": sanitize_text(detected.get("version", ""), 80),
+                "extrainfo": sanitize_text(detected.get("extrainfo", ""), 200),
                 "cpe": detected.get("cpe", []),
-                "banner": banner or detected.get("banner", ""),
-                "source": detected.get("source", "socket"),
+                "banner": sanitize_text(banner or detected.get("banner", ""), 300),
+                "source": sanitize_text(detected.get("source", "socket"), 24),
             }
             services.append(service)
 
@@ -77,7 +79,7 @@ class ServiceDetector:
         if not chunks:
             return ""
         banner = b" ".join(chunks).decode("utf-8", errors="replace")
-        return " ".join(banner.split())[:300]
+        return sanitize_text(banner, 300)
 
     def _detect_with_nmap(self, os_detect: bool = False) -> tuple[dict[int, dict], dict]:
         """Run Nmap service detection when python-nmap and Nmap are installed."""
@@ -103,13 +105,19 @@ class ServiceDetector:
 
             tcp_data = scanner[host].get("tcp", {}) if host in scanner.all_hosts() else {}
             for port, details in tcp_data.items():
+                script_data = details.get("script", {})
+                if not isinstance(script_data, dict):
+                    script_data = {}
+                cpe_data = details.get("cpe", [])
+                if isinstance(cpe_data, str):
+                    cpe_data = [cpe_data]
                 services[int(port)] = {
-                    "service": details.get("name", ""),
-                    "product": details.get("product", ""),
-                    "version": details.get("version", ""),
-                    "extrainfo": details.get("extrainfo", ""),
-                    "cpe": details.get("cpe", []),
-                    "banner": details.get("script", {}).get("banner", ""),
+                    "service": sanitize_text(details.get("name", ""), 80),
+                    "product": sanitize_text(details.get("product", ""), 120),
+                    "version": sanitize_text(details.get("version", ""), 80),
+                    "extrainfo": sanitize_text(details.get("extrainfo", ""), 200),
+                    "cpe": [sanitize_text(cpe, 200) for cpe in cpe_data[:10]],
+                    "banner": sanitize_text(script_data.get("banner", ""), 300),
                     "source": "nmap",
                 }
 
@@ -118,11 +126,12 @@ class ServiceDetector:
                 if os_matches:
                     best = os_matches[0]
                     os_info = {
-                        "name": best.get("name", "Unknown"),
-                        "accuracy": best.get("accuracy", "0"),
+                        "name": sanitize_text(best.get("name", "Unknown"), 120),
+                        "accuracy": sanitize_text(best.get("accuracy", "0"), 8),
                     }
         except Exception as exc:  # noqa: BLE001 - nmap raises several runtime-specific errors
-            self.logger.warning("Nmap detection failed: %s", exc)
+            self.logger.warning("Nmap detection failed. Ensure Nmap is installed and available on PATH.")
+            self.logger.debug("Nmap detection detail: %s", sanitize_text(exc, 300))
 
         return services, os_info
 
@@ -133,6 +142,19 @@ class ServiceDetector:
             return socket.getservbyport(port, "tcp")
         except OSError:
             return ""
+
+    @staticmethod
+    def _valid_ports(ports: Iterable[int]) -> list[int]:
+        """Return sorted TCP ports, ignoring malformed values defensively."""
+        valid: set[int] = set()
+        for port in ports:
+            try:
+                candidate = int(port)
+            except (TypeError, ValueError):
+                continue
+            if 1 <= candidate <= 65535:
+                valid.add(candidate)
+        return sorted(valid)
 
     @staticmethod
     def _probes_for_port(port: int) -> list[bytes]:

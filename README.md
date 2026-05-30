@@ -1,6 +1,6 @@
 # Python Network Vulnerability Scanner
 
-A professional, portfolio-ready CLI network vulnerability scanner built with Python. It scans TCP ports, enriches open services with Nmap version detection, performs lightweight banner grabbing, checks potential CVEs through the NVD API, and exports polished HTML and JSON reports.
+A professional CLI network vulnerability scanner built with Python. It scans TCP ports, enriches open services with Nmap version detection, performs lightweight banner grabbing, checks potential CVEs through the NVD API, and exports polished HTML and JSON reports.
 
 > This tool is intended only for authorized security testing.
 
@@ -15,7 +15,7 @@ A professional, portfolio-ready CLI network vulnerability scanner built with Pyt
 - CVSS severity filtering
 - Responsive dark-theme HTML report
 - Optional JSON report export
-- Optional scan history file
+- Optional bounded scan history file
 - Rich terminal progress bars, tables, and colored statuses
 - Rotating logs written to `logs/scanner.log`
 - Windows and Linux friendly
@@ -24,25 +24,26 @@ A professional, portfolio-ready CLI network vulnerability scanner built with Pyt
 
 ```text
 network_scanner/
-├── main.py
-├── scanner/
-│   ├── __init__.py
-│   ├── port_scanner.py
-│   ├── banner_grabber.py
-│   ├── cve_lookup.py
-│   ├── report_generator.py
-│   └── utils.py
-├── reports/
-├── logs/
-├── templates/
-│   └── report_template.html
-├── requirements.txt
-└── README.md
+|-- main.py
+|-- scanner/
+|   |-- __init__.py
+|   |-- port_scanner.py
+|   |-- banner_grabber.py
+|   |-- cve_lookup.py
+|   |-- report_generator.py
+|   `-- utils.py
+|-- reports/
+|-- logs/
+|-- templates/
+|   `-- report_template.html
+|-- requirements.txt
+|-- SECURITY.md
+`-- README.md
 ```
 
 ## Setup
 
-Install Python 3.10 or newer, then install the Python dependencies:
+Install Python 3.10 or newer, then install dependencies:
 
 ```bash
 cd network_scanner
@@ -85,6 +86,8 @@ Windows PowerShell:
 $env:NVD_API_KEY="your-api-key"
 ```
 
+Do not hardcode API keys into source files or commit them to Git.
+
 ## Usage
 
 Basic scan:
@@ -121,53 +124,48 @@ python main.py -t example.com -p 80,443,8000-8100 --async-scan
 
 | Argument | Description |
 | --- | --- |
-| `-t`, `--target` | Target IP address or domain name |
+| `-t`, `--target` | Target IPv4 address or domain name |
 | `-p`, `--ports` | Port expression such as `22,80,443` or `1-1000` |
-| `-o`, `--output` | HTML report output path |
-| `--json` | Optional JSON report path |
-| `--threads` | Maximum TCP scan worker threads |
-| `--timeout` | Socket timeout in seconds |
+| `-o`, `--output` | HTML report output path inside the project directory |
+| `--json` | Optional JSON report path inside the project directory |
+| `--threads` | Maximum TCP scan worker threads, 1-512 |
+| `--timeout` | Socket timeout in seconds, 0.1-30 |
 | `--async-scan` | Use asyncio instead of threaded scanning |
 | `--min-severity` | Minimum CVE severity: `LOW`, `MEDIUM`, `HIGH`, `CRITICAL` |
 | `--no-cve` | Skip NVD CVE lookup |
-| `--max-cves` | Maximum CVEs per service query |
+| `--max-cves` | Maximum CVEs per service query, 1-20 |
 | `--os-detect` | Attempt Nmap OS detection |
 | `--history` | Append a compact entry to `reports/scan_history.json` |
 | `-v`, `--verbose` | Enable verbose terminal and log output |
 
+## Security Hardening
+
+- Target input must be a bare IPv4 address or hostname, not a URL.
+- Port expressions are validated and bounded.
+- Thread count, timeout, and CVE result limits are range-checked.
+- HTML and JSON outputs are restricted to this project directory.
+- Service banners and API responses are sanitized before terminal, log, JSON, or HTML output.
+- HTML reports use Jinja autoescaping and a restrictive Content Security Policy.
+- Nmap arguments are fixed by the application, and scan targets are resolved before Nmap is called.
+- Logs and generated reports are ignored by Git by default.
+
 ## Mock Terminal Output
 
 ```text
-╭─ Authorized Use Only ─────────────────────────────╮
-│ This tool is intended only for authorized security testing. │
-╰───────────────────────────────────────────────────╯
+Authorized Use Only
+This tool is intended only for authorized security testing.
 
-Scanning TCP ports  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:00:05
+Scanning TCP ports  1000/1000 0:00:05
 Open ports: [22, 80, 443]
 
-                      Open Ports and Services
-┏━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┓
-┃ Port ┃ Service ┃ Product    ┃ Version ┃ Banner               ┃
-┡━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━┩
-│ 22   │ ssh     │ OpenSSH    │ 8.9     │ SSH-2.0-OpenSSH_8.9  │
-│ 80   │ http    │ nginx      │ 1.24.0  │ HTTP/1.1 200 OK      │
-│ 443  │ https   │ nginx      │ 1.24.0  │ -                    │
-└──────┴─────────┴────────────┴─────────┴──────────────────────┘
+Port  Service  Product  Version  Banner
+22    ssh      OpenSSH  8.9      SSH-2.0-OpenSSH_8.9
+80    http     nginx    1.24.0   HTTP/1.1 200 OK
+443   https    nginx    1.24.0   -
 
 HTML report saved: reports/scan_report.html
 JSON report saved: reports/scan_report.json
 ```
-
-## Mock HTML Report
-
-The generated report includes a dark dashboard layout with:
-
-- Target and scan timestamp
-- Count cards for scanned ports, open ports, and CVE matches
-- Open port and service table
-- Optional OS detection result
-- Vulnerability table with severity badges
-- Links to NVD CVE detail pages
 
 ## How CVE Matching Works
 
@@ -179,6 +177,8 @@ The scanner builds a keyword from Nmap service detection fields such as product 
 - Default HTML report: `reports/scan_report.html`
 - Optional JSON export: pass `--json reports/name.json`
 - Optional history: pass `--history`
+
+Generated reports and logs may contain internal hostnames, service banners, and vulnerability details, so they are ignored by Git by default.
 
 ## Security and Ethics
 

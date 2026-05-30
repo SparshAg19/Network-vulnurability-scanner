@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'none'" />
   <title>Network Vulnerability Report - {{ target }}</title>
   <style>
     :root {
@@ -132,18 +133,12 @@
       text-transform: uppercase;
     }
 
-    .print-button {
+    .print-hint {
       border: 1px solid var(--line);
       background: var(--surface-2);
       color: var(--text);
       padding: 7px 10px;
       font: 700 12px var(--sans);
-      cursor: pointer;
-    }
-
-    .print-button:hover {
-      border-color: var(--accent);
-      color: var(--text-strong);
     }
 
     .header-grid {
@@ -725,7 +720,7 @@
         padding: 0;
       }
 
-      .print-button {
+      .print-hint {
         display: none;
       }
 
@@ -755,13 +750,14 @@
 <body>
   {% set ns = namespace(critical=0, high=0, medium=0, low=0, unknown=0) %}
   {% for vuln in vulnerabilities %}
-    {% if vuln.severity == "CRITICAL" %}
+    {% set severity = vuln.severity | upper %}
+    {% if severity == "CRITICAL" %}
       {% set ns.critical = ns.critical + 1 %}
-    {% elif vuln.severity == "HIGH" %}
+    {% elif severity == "HIGH" %}
       {% set ns.high = ns.high + 1 %}
-    {% elif vuln.severity == "MEDIUM" %}
+    {% elif severity == "MEDIUM" %}
       {% set ns.medium = ns.medium + 1 %}
-    {% elif vuln.severity == "LOW" %}
+    {% elif severity == "LOW" %}
       {% set ns.low = ns.low + 1 %}
     {% else %}
       {% set ns.unknown = ns.unknown + 1 %}
@@ -780,7 +776,7 @@
       </div>
       <div class="top-actions">
         <div class="classification">Authorized Security Testing</div>
-        <button class="print-button" type="button" onclick="window.print()">Print / Save PDF</button>
+        <div class="print-hint">Browser Print Ready</div>
       </div>
     </header>
 
@@ -970,14 +966,18 @@
           </thead>
           <tbody>
             {% for vuln in vulnerabilities %}
+            {% set severity = vuln.severity | upper %}
+            {% if severity not in ["CRITICAL", "HIGH", "MEDIUM", "LOW"] %}
+              {% set severity = "UNKNOWN" %}
+            {% endif %}
             <tr>
               <td>
-                <span class="badge severity-{{ vuln.severity | lower }}">
-                  {{ vuln.severity }}
+                <span class="badge severity-{{ severity | lower }}">
+                  {{ severity }}
                 </span>
               </td>
               <td class="mono">{{ vuln.cvss_score }}</td>
-              <td><a class="cve-id" href="{{ vuln.url }}" target="_blank" rel="noreferrer">{{ vuln.id }}</a></td>
+              <td><a class="cve-id" href="{{ vuln.url }}" target="_blank" rel="noopener noreferrer">{{ vuln.id }}</a></td>
               <td class="mono">{{ vuln.port }}/tcp</td>
               <td>{{ vuln.service or "-" }}</td>
               <td class="description">{{ vuln.description }}</td>

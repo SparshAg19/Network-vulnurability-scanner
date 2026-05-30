@@ -5,7 +5,9 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
+
+from scanner.utils import write_text_atomic
 
 
 class ReportGenerator:
@@ -21,6 +23,7 @@ class ReportGenerator:
         self.environment = Environment(
             loader=FileSystemLoader(self.template_dir),
             autoescape=select_autoescape(["html", "xml"]),
+            undefined=StrictUndefined,
         )
 
     def generate_html_report(self, report_data: dict, output_path: str | Path) -> Path:
@@ -29,6 +32,6 @@ class ReportGenerator:
         output.parent.mkdir(parents=True, exist_ok=True)
         template = self.environment.get_template("report_template.html")
         html = template.render(**report_data)
-        output.write_text(html, encoding="utf-8")
+        write_text_atomic(output, html)
         self.logger.info("HTML report written to %s", output)
         return output

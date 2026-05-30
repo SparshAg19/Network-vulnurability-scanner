@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.table import Table
@@ -17,11 +18,14 @@ from scanner.port_scanner import PortScanner
 from scanner.report_generator import ReportGenerator
 from scanner.utils import (
     DEFAULT_SEVERITIES,
+    bounded_float,
+    bounded_int,
     build_scan_metadata,
-    ensure_directory,
     parse_port_range,
+    safe_output_path,
     save_history,
     save_json_report,
+    sanitize_text,
     setup_logging,
     severity_meets_threshold,
     validate_target,
@@ -29,7 +33,12 @@ from scanner.utils import (
 
 
 WARNING_TEXT = "This tool is intended only for authorized security testing."
-NVD_NOTICE = "This product uses data from the NVD API."
+NVD_NOTICE = "This product uses data from the NVD API but is not endorsed or certified by the NVD."
+
+
+def terminal_text(value: object, max_length: int = 300) -> str:
+    """Sanitize and escape untrusted values before rendering with Rich markup."""
+    return escape(sanitize_text(value, max_length))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -66,13 +75,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--threads",
         type=int,
         default=100,
-        help="Maximum worker threads for TCP scanning.",
+        help="Maximum worker threads for TCP scanning. Allowed range: 1-512.",
     )
     parser.add_argument(
         "--timeout",
         type=float,
         default=1.0,
-        help="Socket timeout in seconds.",
+        help="Socket timeout in seconds. Allowed range: 0.1-30.",
     )
     parser.add_argument(
         "--async-scan",
@@ -94,7 +103,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-cves",
         type=int,
         default=5,
-        help="Maximum CVEs to keep per detected service.",
+        help="Maximum CVEs to keep per detected service. Allowed range: 1-20.",
     )
     parser.add_argument(
         "--os-detect",
@@ -140,11 +149,11 @@ def render_open_ports_table(console: Console, services: list[dict]) -> None:
     else:
         for service in services:
             table.add_row(
-                str(service.get("port", "")),
-                service.get("service") or "unknown",
-                service.get("product") or "-",
-                service.get("version") or "-",
-                service.get("banner") or "-",
+                terminal_text(service.get("port", ""), 16),
+                terminal_text(service.get("service") or "unknown", 80),
+                terminal_text(service.get("product") or "-", 120),
+                terminal_text(service.get("version") or "-", 80),
+                terminal_text(service.get("banner") or "-", 200),
             )
     console.print(table)
 
@@ -170,11 +179,11 @@ def render_vulnerability_table(console: Console, vulnerabilities: list[dict]) ->
                 "LOW": "green",
             }.get(severity, "white")
             table.add_row(
-                str(vuln.get("port", "")),
-                vuln.get("id", ""),
-                f"[{color}]{severity}[/{color}]",
-                str(vuln.get("cvss_score", "N/A")),
-                vuln.get("description", "")[:160],
+                terminal_text(vuln.get("port", ""), 16),
+                terminal_text(vuln.get("id", ""), 40),
+                f"[{color}]{terminal_text(severity, 16)}[/{color}]",
+                terminal_text(vuln.get("cvss_score", "N/A"), 16),
+                terminal_text(vuln.get("description", ""), 160),
             )
     console.print(table)
 
@@ -191,15 +200,35 @@ def main() -> int:
     print_warning(console)
 
     try:
+        args.threads = bounded_int("--threads", args.threads, 1, 512)
+        args.timeout = bounded_float("--timeout", args.timeout, 0.1, 30.0)
+        args.max_cves = bounded_int("--max-cves", args.max_cves, 1, 20)
         target_ip = validate_target(args.target)
+        target_display = sanitize_text(args.target, 253)
         ports = parse_port_range(args.ports)
-    except ValueError as exc:
-        logger.error("Invalid input: %s", exc)
-        console.print(f"[bold red]Input error:[/bold red] {exc}")
+        output_path = safe_output_path(
+            args.output,
+            base_dir=base_dir,
+            default_subdir="reports",
+            allowed_suffixes=(".html", ".htm"),
+        )
+        json_path = (
+            safe_output_path(
+                args.json_output,
+                base_dir=base_dir,
+                default_subdir="reports",
+                allowed_suffixes=(".json",),
+            )
+            if args.json_output
+            else None
+        )
+    except (OSError, ValueError) as exc:
+        logger.error("Invalid input: %s", sanitize_text(exc, 300))
+        console.print(f"[bold red]Input error:[/bold red] {terminal_text(exc, 300)}")
         return 2
 
-    metadata = build_scan_metadata(args.target, target_ip, args.ports)
-    logger.info("Starting scan for %s (%s) on %s", args.target, target_ip, args.ports)
+    metadata = build_scan_metadata(target_display, target_ip, args.ports)
+    logger.info("Starting scan for %s (%s) on %s", target_display, target_ip, sanitize_text(args.ports, 120))
 
     scanner = PortScanner(
         target=target_ip,
@@ -225,7 +254,7 @@ def main() -> int:
 
         open_ports = scanner.scan(progress_callback=advance, async_mode=args.async_scan)
 
-    console.print(f"[bold green]Open ports:[/bold green] {open_ports or 'none'}")
+    console.print(f"[bold green]Open ports:[/bold green] {terminal_text(open_ports or 'none', 300)}")
 
     detector = ServiceDetector(
         target=target_ip,
@@ -256,7 +285,7 @@ def main() -> int:
 
     report_data = {
         "metadata": metadata,
-        "target": args.target,
+        "target": target_display,
         "target_ip": target_ip,
         "ports_scanned": len(ports),
         "open_ports": open_ports,
@@ -268,33 +297,44 @@ def main() -> int:
         "nvd_notice": NVD_NOTICE,
     }
 
-    output_path = Path(args.output)
-    if not output_path.is_absolute():
-        output_path = base_dir / output_path
-    ensure_directory(output_path.parent)
-
     generator = ReportGenerator(
         template_dir=base_dir / "templates",
         logger=logger,
     )
-    html_path = generator.generate_html_report(report_data, output_path)
-    console.print(f"[bold green]HTML report saved:[/bold green] {html_path}")
+    try:
+        html_path = generator.generate_html_report(report_data, output_path)
+    except OSError as exc:
+        logger.error("Could not write HTML report: %s", exc.__class__.__name__)
+        console.print("[bold red]Report error:[/bold red] Could not write the HTML report. Check output directory permissions.")
+        return 1
+    except Exception as exc:  # noqa: BLE001 - keep CLI failures controlled and user-friendly
+        logger.error("Could not generate HTML report: %s", sanitize_text(exc, 200))
+        console.print("[bold red]Report error:[/bold red] Could not generate the HTML report.")
+        return 1
+    console.print(f"[bold green]HTML report saved:[/bold green] {terminal_text(html_path, 300)}")
 
-    if args.json_output:
-        json_path = Path(args.json_output)
-        if not json_path.is_absolute():
-            json_path = base_dir / json_path
-        save_json_report(report_data, json_path)
-        console.print(f"[bold green]JSON report saved:[/bold green] {json_path}")
+    if json_path:
+        try:
+            save_json_report(report_data, json_path)
+        except OSError as exc:
+            logger.error("Could not write JSON report: %s", exc.__class__.__name__)
+            console.print("[bold red]Report error:[/bold red] Could not write the JSON report. Check output directory permissions.")
+            return 1
+        console.print(f"[bold green]JSON report saved:[/bold green] {terminal_text(json_path, 300)}")
 
     if args.history:
         history_path = base_dir / "reports" / "scan_history.json"
-        save_history(report_data, history_path)
-        console.print(f"[bold green]History updated:[/bold green] {history_path}")
+        try:
+            save_history(report_data, history_path)
+        except OSError as exc:
+            logger.error("Could not update scan history: %s", exc.__class__.__name__)
+            console.print("[bold yellow]History warning:[/bold yellow] Could not update scan history.")
+        else:
+            console.print(f"[bold green]History updated:[/bold green] {terminal_text(history_path, 300)}")
 
     logger.info(
         "Scan completed for %s. Open ports=%s, vulnerabilities=%s",
-        args.target,
+        target_display,
         len(open_ports),
         len(vulnerabilities),
     )

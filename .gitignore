@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 .venv/
 .env
+*.tmp
+*.bak
 
 logs/*.log
 reports/*.html
